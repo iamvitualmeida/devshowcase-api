@@ -3,12 +3,15 @@ package com.devshowcase.api.service;
 import com.devshowcase.api.dto.request.ProjectRequest;
 import com.devshowcase.api.dto.response.ProjectResponse;
 import com.devshowcase.api.dto.response.TechnologyResponse;
+import com.devshowcase.api.exception.ResourceNotFoundException;
 import com.devshowcase.api.model.Profile;
 import com.devshowcase.api.model.Project;
 import com.devshowcase.api.model.Technology;
 import com.devshowcase.api.repository.ProfileRepository;
 import com.devshowcase.api.repository.ProjectRepository;
 import com.devshowcase.api.repository.TechnologyRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,7 +36,8 @@ public class ProjectService {
     public ProjectResponse create(ProjectRequest request) {
 
         Profile profile = profileRepository.findById(request.profileId())
-                .orElseThrow(() -> new RuntimeException("Perfil não encontrado"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Perfil não encontrado"));
 
         Project project = new Project(
                 request.title(),
@@ -55,12 +59,33 @@ public class ProjectService {
         return toResponse(savedProject);
     }
 
-    public List<ProjectResponse> findAll() {
+    public Page<ProjectResponse> findAll(Long technologyId, Pageable pageable) {
 
-        return projectRepository.findAll()
-                .stream()
-                .map(this::toResponse)
-                .toList();
+        Page<Project> projects;
+
+        if (technologyId != null) {
+            projects = projectRepository.findByTechnologies_Id(
+                    technologyId,
+                    pageable
+            );
+        } else {
+            projects = projectRepository.findAll(pageable);
+        }
+
+        return projects.map(this::toResponse);
+    }
+
+    public ProjectResponse upvote(Long projectId) {
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Projeto não encontrado"));
+
+        project.setUpvotes(project.getUpvotes() + 1);
+
+        Project savedProject = projectRepository.save(project);
+
+        return toResponse(savedProject);
     }
 
     private ProjectResponse toResponse(Project project) {
@@ -79,7 +104,9 @@ public class ProjectService {
                 project.getDescription(),
                 project.getUrl(),
                 project.getProfile().getId(),
-                technologies
+                technologies,
+                project.getAverageRating(),
+                project.getUpvotes()
         );
     }
 }

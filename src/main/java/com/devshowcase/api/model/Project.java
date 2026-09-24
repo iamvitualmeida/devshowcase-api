@@ -1,15 +1,6 @@
 package com.devshowcase.api.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,12 +21,16 @@ public class Project {
 
     private String url;
 
-    // Relacionamento: muitos projetos pertencem a um perfil
+    @Column(nullable = false)
+    private Double averageRating = 0.0;
+
+    @Column(nullable = false)
+    private Long upvotes = 0L;
+
     @ManyToOne
     @JoinColumn(name = "profile_id", nullable = false)
     private Profile profile;
 
-    // Relacionamento: muitos projetos podem utilizar muitas tecnologias
     @ManyToMany
     @JoinTable(
             name = "project_technologies",
@@ -44,11 +39,9 @@ public class Project {
     )
     private List<Technology> technologies = new ArrayList<>();
 
-    // Construtor vazio exigido pelo JPA
     public Project() {
     }
 
-    // Construtor
     public Project(String title, String description, String url, Profile profile) {
         this.title = title;
         this.description = description;
@@ -82,6 +75,22 @@ public class Project {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public Double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(Double averageRating) {
+        this.averageRating = averageRating;
+    }
+
+    public Long getUpvotes() {
+        return upvotes;
+    }
+
+    public void setUpvotes(Long upvotes) {
+        this.upvotes = upvotes;
     }
 
     public Profile getProfile() {

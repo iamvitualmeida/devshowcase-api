@@ -1,13 +1,6 @@
 package com.devshowcase.api.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "feedbacks")
@@ -17,10 +10,12 @@ public class Feedback {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private Integer rating;
+
     @Column(nullable = false, length = 1000)
     private String comment;
 
-    // Muitos feedbacks pertencem a um projeto
     @ManyToOne
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
@@ -28,13 +23,22 @@ public class Feedback {
     public Feedback() {
     }
 
-    public Feedback(String comment, Project project) {
+    public Feedback(Integer rating, String comment, Project project) {
+        this.rating = rating;
         this.comment = comment;
         this.project = project;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public Integer getRating() {
+        return rating;
+    }
+
+    public void setRating(Integer rating) {
+        this.rating = rating;
     }
 
     public String getComment() {

@@ -8,6 +8,8 @@ public record ProjectResponse(
         String description,
         String url,
         Long profileId,
-        List<TechnologyResponse> technologies
+        List<TechnologyResponse> technologies,
+        Double averageRating,
+        Long upvotes
 ) {
 }

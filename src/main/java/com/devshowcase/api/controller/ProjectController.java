@@ -4,10 +4,10 @@ import com.devshowcase.api.dto.request.ProjectRequest;
 import com.devshowcase.api.dto.response.ProjectResponse;
 import com.devshowcase.api.service.ProjectService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -28,7 +28,19 @@ public class ProjectController {
     }
 
     @GetMapping
-    public List<ProjectResponse> findAll() {
-        return projectService.findAll();
+    public Page<ProjectResponse> findAll(
+            @RequestParam(required = false) Long technologyId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        return projectService.findAll(
+                technologyId,
+                PageRequest.of(page, size)
+        );
+    }
+
+    @PutMapping("/{id}/upvote")
+    public ProjectResponse upvote(@PathVariable Long id) {
+        return projectService.upvote(id);
     }
 }
